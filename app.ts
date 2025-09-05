@@ -1,12 +1,13 @@
 import express from "express";
 import mongoose from "mongoose";
-
+import cors from "cors";
 import AuthRouter from "./routes/auth";
 
 const app = express();
 
 const apiVersion = "v1";
 
+app.use(cors());
 app.use(express.json());
 app.use(`/api/${apiVersion}/`, AuthRouter);
 
