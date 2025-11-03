@@ -1,7 +1,10 @@
 import express from "express";
-import mongoose from "mongoose";
 import cors from "cors";
 import AuthRouter from "./routes/auth";
+import DiaryRouter from "./routes/diary";
+import AuthMiddleware from "./middleware/auth";
+import { connectToMongoDB } from "./db";
+import { errorHandler, routerNotFoundHandler } from "./utils/common";
 
 const app = express();
 
@@ -9,17 +12,11 @@ const apiVersion = "v1";
 
 app.use(cors());
 app.use(express.json());
-app.use(`/api/${apiVersion}/`, AuthRouter);
+app.use(`/api/${apiVersion}`, AuthRouter);
+app.use(`/api/${apiVersion}/diary`, AuthMiddleware.checkToken, DiaryRouter);
 
-async function connectToMongoDB() {
-  const url = "mongodb://127.0.0.1:27017/mwa";
-  try {
-    await mongoose.connect(url);
-    console.log("DB connected successfully");
-  } catch (error) {
-    console.log("Error connecting to the db");
-  }
-}
+app.use(routerNotFoundHandler);
+app.use(errorHandler);
 
 async function main() {
   await connectToMongoDB();
